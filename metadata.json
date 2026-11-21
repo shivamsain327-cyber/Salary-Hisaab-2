@@ -1,0 +1,8 @@
+{
+  "name": "Remix Salary Hisaab",
+  "description": "Track monthly salary, daily expenses, extra income, and udhaar loans.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

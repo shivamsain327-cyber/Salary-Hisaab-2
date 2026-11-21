@@ -1,0 +1,99 @@
+{
+  "entities": {
+    "UserLedgerSettings": {
+      "title": "UserLedgerSettings",
+      "description": "User-level opening cash balance settings for Salary Hisaab.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID of the owner." },
+        "openingCash": { "type": "number", "description": "Opening cash in hand in INR (>= 0)." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation (FieldValue.serverTimestamp())." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update (FieldValue.serverTimestamp())." }
+      },
+      "required": ["userId", "openingCash", "createdAt", "updatedAt"]
+    },
+    "MonthlySalary": {
+      "title": "MonthlySalary",
+      "description": "Salary configured for a specific month (yyyy-MM).",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID of the owner." },
+        "monthKey": { "type": "string", "description": "Month identifier in yyyy-MM format." },
+        "amount": { "type": "number", "description": "Monthly salary in INR (>= 0)." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation (FieldValue.serverTimestamp())." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update (FieldValue.serverTimestamp())." }
+      },
+      "required": ["userId", "monthKey", "amount", "createdAt", "updatedAt"]
+    },
+    "LedgerTransaction": {
+      "title": "LedgerTransaction",
+      "description": "An expense (OUT) or extra income (IN) entry.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID of the owner." },
+        "type": { "type": "string", "enum": ["OUT", "IN"], "description": "Transaction direction." },
+        "amount": { "type": "number", "description": "Amount in INR (> 0)." },
+        "category": { "type": "string", "description": "Category name." },
+        "note": { "type": "string", "description": "Optional short note (<= 60 chars)." },
+        "date": { "type": "string", "description": "Transaction date in yyyy-MM-dd format." },
+        "monthKey": { "type": "string", "description": "Derived yyyy-MM month key." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation (FieldValue.serverTimestamp())." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update (FieldValue.serverTimestamp())." }
+      },
+      "required": ["userId", "type", "amount", "category", "date", "monthKey", "createdAt", "updatedAt"]
+    },
+    "UdhaarLoan": {
+      "title": "UdhaarLoan",
+      "description": "A loan borrowed (LIYA) or lent (DIYA) entry.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID of the owner." },
+        "person": { "type": "string", "description": "Counterparty name (1..40 chars)." },
+        "type": { "type": "string", "enum": ["LIYA", "DIYA"], "description": "Loan direction." },
+        "amount": { "type": "number", "description": "Principal amount in INR (> 0)." },
+        "date": { "type": "string", "description": "Loan date in yyyy-MM-dd format." },
+        "dueDate": { "type": "string", "description": "Optional due date in yyyy-MM-dd format." },
+        "note": { "type": "string", "description": "Optional note (<= 60 chars)." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation (FieldValue.serverTimestamp())." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update (FieldValue.serverTimestamp())." }
+      },
+      "required": ["userId", "person", "type", "amount", "date", "createdAt", "updatedAt"]
+    },
+    "LoanPayment": {
+      "title": "LoanPayment",
+      "description": "A partial or full repayment recorded against an UdhaarLoan.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID of the owner." },
+        "loanId": { "type": "string", "description": "Parent UdhaarLoan document ID." },
+        "amount": { "type": "number", "description": "Repayment amount in INR (> 0)." },
+        "date": { "type": "string", "description": "Repayment date in yyyy-MM-dd format." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation (FieldValue.serverTimestamp())." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update (FieldValue.serverTimestamp())." }
+      },
+      "required": ["userId", "loanId", "amount", "date", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserLedgerSettings" },
+      "description": "Per-user opening cash balance configuration."
+    },
+    "/users/{userId}/salaries/{monthKey}": {
+      "schema": { "$ref": "#/entities/MonthlySalary" },
+      "description": "Per-month salary records owned by the user."
+    },
+    "/users/{userId}/transactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/LedgerTransaction" },
+      "description": "User expense and extra income transactions."
+    },
+    "/users/{userId}/loans/{loanId}": {
+      "schema": { "$ref": "#/entities/UdhaarLoan" },
+      "description": "User udhaar (borrowed/lent) loan records."
+    },
+    "/users/{userId}/loanPayments/{paymentId}": {
+      "schema": { "$ref": "#/entities/LoanPayment" },
+      "description": "Repayment records linked to parent UdhaarLoan documents."
+    }
+  }
+}

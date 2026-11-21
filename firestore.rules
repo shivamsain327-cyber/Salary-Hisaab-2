@@ -1,0 +1,191 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidMonthKey(m) {
+      return m is string && m.size() == 7 && m.matches('^[0-9]{4}-[0-9]{2}$');
+    }
+
+    function isValidDateStr(d) {
+      return d is string && d.size() == 10 && d.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
+    }
+
+    function isValidAmountNonNeg(n) {
+      return (n is int || n is float) && n >= 0 && n <= 1000000000;
+    }
+
+    function isValidAmountPos(n) {
+      return (n is int || n is float) && n > 0 && n <= 1000000000;
+    }
+
+    function isValidTimestamp(ts) {
+      return ts is timestamp && ts <= request.time;
+    }
+
+    function isValidUserSettings(data, userId) {
+      return data.userId is string &&
+             data.userId == userId &&
+             isValidAmountNonNeg(data.openingCash) &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidMonthlySalary(data, userId, monthKey) {
+      return data.userId is string &&
+             data.userId == userId &&
+             isValidMonthKey(data.monthKey) &&
+             data.monthKey == monthKey &&
+             isValidAmountNonNeg(data.amount) &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidTransaction(data, userId) {
+      return data.userId is string &&
+             data.userId == userId &&
+             data.type in ['OUT', 'IN'] &&
+             isValidAmountPos(data.amount) &&
+             data.category is string && data.category.size() >= 1 && data.category.size() <= 40 &&
+             (!('note' in data) || (data.note is string && data.note.size() <= 60)) &&
+             isValidDateStr(data.date) &&
+             isValidMonthKey(data.monthKey) &&
+             data.monthKey == data.date[0:7] &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidLoan(data, userId) {
+      return data.userId is string &&
+             data.userId == userId &&
+             data.person is string && data.person.size() >= 1 && data.person.size() <= 40 &&
+             data.type in ['LIYA', 'DIYA'] &&
+             isValidAmountPos(data.amount) &&
+             isValidDateStr(data.date) &&
+             (!('dueDate' in data) || isValidDateStr(data.dueDate)) &&
+             (!('note' in data) || (data.note is string && data.note.size() <= 60)) &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidLoanPayment(data, userId) {
+      return data.userId is string &&
+             data.userId == userId &&
+             isValidId(data.loanId) &&
+             isValidAmountPos(data.amount) &&
+             isValidDateStr(data.date) &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow create: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       incoming().keys().hasAll(['userId', 'openingCash', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['userId', 'openingCash', 'createdAt', 'updatedAt']) &&
+                       isValidUserSettings(incoming(), userId);
+      allow update: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidUserSettings(incoming(), userId) &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['openingCash', 'updatedAt']);
+      allow delete: if isOwner(userId) && isValidId(userId);
+
+      match /salaries/{monthKey} {
+        allow get: if isOwner(userId) && isValidMonthKey(monthKey);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) &&
+                         isValidMonthKey(monthKey) &&
+                         incoming().keys().hasAll(['userId', 'monthKey', 'amount', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'monthKey', 'amount', 'createdAt', 'updatedAt']) &&
+                         isValidMonthlySalary(incoming(), userId, monthKey);
+        allow update: if isOwner(userId) &&
+                         isValidMonthKey(monthKey) &&
+                         incoming().userId == existing().userId &&
+                         incoming().monthKey == existing().monthKey &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidMonthlySalary(incoming(), userId, monthKey) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['amount', 'updatedAt']);
+        allow delete: if isOwner(userId) && isValidMonthKey(monthKey);
+      }
+
+      match /transactions/{transactionId} {
+        allow get: if isOwner(userId) && isValidId(transactionId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) &&
+                         isValidId(transactionId) &&
+                         incoming().keys().hasAll(['userId', 'type', 'amount', 'category', 'date', 'monthKey', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'type', 'amount', 'category', 'note', 'date', 'monthKey', 'createdAt', 'updatedAt']) &&
+                         isValidTransaction(incoming(), userId);
+        allow update: if isOwner(userId) &&
+                         isValidId(transactionId) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidTransaction(incoming(), userId) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['type', 'amount', 'category', 'note', 'date', 'monthKey', 'updatedAt']);
+        allow delete: if isOwner(userId) && isValidId(transactionId);
+      }
+
+      match /loans/{loanId} {
+        allow get: if isOwner(userId) && isValidId(loanId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) &&
+                         isValidId(loanId) &&
+                         incoming().keys().hasAll(['userId', 'person', 'type', 'amount', 'date', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'person', 'type', 'amount', 'date', 'dueDate', 'note', 'createdAt', 'updatedAt']) &&
+                         isValidLoan(incoming(), userId);
+        allow update: if isOwner(userId) &&
+                         isValidId(loanId) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidLoan(incoming(), userId) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['person', 'type', 'amount', 'date', 'dueDate', 'note', 'updatedAt']);
+        allow delete: if isOwner(userId) && isValidId(loanId);
+      }
+
+      match /loanPayments/{paymentId} {
+        allow get: if isOwner(userId) && isValidId(paymentId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) &&
+                         isValidId(paymentId) &&
+                         incoming().keys().hasAll(['userId', 'loanId', 'amount', 'date', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'loanId', 'amount', 'date', 'createdAt', 'updatedAt']) &&
+                         isValidLoanPayment(incoming(), userId) &&
+                         exists(/databases/$(database)/documents/users/$(userId)/loans/$(incoming().loanId));
+        allow update: if isOwner(userId) &&
+                         isValidId(paymentId) &&
+                         incoming().userId == existing().userId &&
+                         incoming().loanId == existing().loanId &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidLoanPayment(incoming(), userId) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['amount', 'date', 'updatedAt']);
+        allow delete: if isOwner(userId) && isValidId(paymentId);
+      }
+    }
+  }
+}

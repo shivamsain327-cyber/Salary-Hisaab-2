@@ -1,0 +1,94 @@
+<resources>
+    <string name="app_name">Salary Hisaab</string>
+    <string name="app_subtitle">Apni salary kahan jaa rahi hai, yahan likhte jao.</string>
+
+    <string name="auth_subtitle">Apna mahine ka kharch, aamdani aur udhaar-hisaab surakshit rakhein.</string>
+    <string name="auth_feature_1_title">Mahine ka hisaab aur chart</string>
+    <string name="auth_feature_1_desc">Salary, extra aamdani aur har kharch ka saaf donut chart.</string>
+    <string name="auth_feature_2_title">Udhaar lena-dena tracker</string>
+    <string name="auth_feature_2_desc">Kisko dena hai aur kisse lena hai, kist ke saath yaad rakhein.</string>
+    <string name="auth_feature_3_title">Cloud backup har phone par</string>
+    <string name="auth_feature_3_desc">Google Sign-In se aapka saara hisaab hamesha surakshit rahega.</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_hisaab">Hisaab</string>
+    <string name="nav_charts">Charts</string>
+    <string name="nav_udhaar">Udhaar</string>
+
+    <string name="label_month">Mahina</string>
+    <string name="label_salary">Is mahine ki salary (₹)</string>
+    <string name="hint_salary">jaise 30000</string>
+    <string name="label_abhi_bacha">✨ Abhi bacha hai</string>
+    <string name="label_salary_short">Salary:</string>
+    <string name="label_upar_se_aaya">Upar se aaya:</string>
+    <string name="label_kharch">Kharch:</string>
+
+    <string name="tab_kharch">💸 Kharch</string>
+    <string name="tab_paise_aaye">💰 Paise aaye</string>
+    <string name="label_amount">Rakam (₹)</string>
+    <string name="label_category_out">Kis cheez par</string>
+    <string name="label_category_in">Kahan se aaya</string>
+    <string name="label_note">Note (optional)</string>
+    <string name="hint_note">jaise sabzi, petrol</string>
+    <string name="label_date">Tareekh</string>
+    <string name="btn_add_kharch">Kharch jodo</string>
+    <string name="btn_add_aamdani">Aamdani jodo</string>
+
+    <string name="title_saara_hisaab">🧾 Saara hisaab</string>
+    <string name="empty_transactions">Is mahine ka koi hisaab nahi.</string>
+
+    <string name="title_kahan_gaya">🍩 Kahan kitna gaya</string>
+    <string name="label_kul_kharch">Kul kharch</string>
+    <string name="empty_categories">Abhi koi kharch nahi joda.</string>
+
+    <string name="title_poora_hisaab">👛 Poora hisaab: haath mein kitna paisa</string>
+    <string name="desc_poora_hisaab">Saare mahino ki salary + aaya paisa − kharch, aur udhaar ka lena-dena milakar.</string>
+    <string name="label_opening_cash">Shuru mein haath mein kitna tha (₹, optional)</string>
+
+    <string name="title_udhaar_hisaab">🤝 Udhaar-Hisaab</string>
+    <string name="label_dena_hai">Mujhe dena hai</string>
+    <string name="label_milna_hai">Mujhe milna hai</string>
+    <string name="label_chuka_diya">Ab tak chuka diya</string>
+    <string name="label_wapas_aaya">Ab tak wapas aaya</string>
+    <string name="tab_udhaar_liya">Maine udhaar liya</string>
+    <string name="tab_udhaar_diya">Maine udhaar diya</string>
+    <string name="label_kisse_liya">Kisse liya</string>
+    <string name="label_kisko_diya">Kisko diya</string>
+    <string name="hint_person">naam</string>
+    <string name="label_due_date">Kab tak wapas (optional)</string>
+    <string name="hint_loan_note">kis kaam ke liye</string>
+    <string name="btn_add_liya">Udhaar liya, jodo</string>
+    <string name="btn_add_diya">Udhaar diya, jodo</string>
+    <string name="title_kiska_baaki">⚖️ Kiska kitna baaki</string>
+    <string name="empty_loans">Abhi koi udhaar nahi.</string>
+    <string name="btn_jodo">Jodo</string>
+
+    <string name="sign_out">Sign Out</string>
+    <string name="sign_out_confirm_title">Account se bahar niklein?</string>
+    <string name="sign_out_confirm_msg">Aapka saara hisaab aapke Google account mein safe rahega.</string>
+    <string name="cancel">Radd karein</string>
+    <string name="confirm_delete">Hatao</string>
+    <string name="delete_loan_title">Ye udhaar hata dein?</string>
+    <string name="delete_loan_msg">Is udhaar aur iske saare bhugtaan record hat jayenge.</string>
+
+    <string name="download_statement">Statement</string>
+    <string name="statement_sheet_title">📄 Statement Download / Share</string>
+    <string name="statement_pdf_title">PDF Statement Download</string>
+    <string name="statement_pdf_desc">Mahine ka saaf A4 PDF hisaab aur udhaar summary.</string>
+    <string name="statement_csv_title">Excel / CSV Statement Download</string>
+    <string name="statement_csv_desc">Spreadsheet ya Google Sheets mein kholne ke liye.</string>
+    <string name="statement_share_title">Summary Share Karein</string>
+    <string name="statement_share_desc">WhatsApp ya message se turant hisaab bhejein.</string>
+
+    <string name="dash_kpi_salary">Mahine ki Salary</string>
+    <string name="dash_kpi_extra">Upar se Aaya</string>
+    <string name="dash_kpi_spent">Kul Kharch</string>
+    <string name="dash_kpi_savings">Bachat Rate</string>
+    <string name="dash_trend_title">📊 Pichhle 6 Mahine ka Trend</string>
+    <string name="dash_trend_in">Aamdani</string>
+    <string name="dash_trend_out">Kharch</string>
+    <string name="dash_top_cats">🔥 Top Kharch Categories</string>
+    <string name="dash_recent_tx">🕒 Haal ke Transactions</string>
+    <string name="dash_view_all">Sab dekho</string>
+</resources>
